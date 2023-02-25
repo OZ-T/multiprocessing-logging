@@ -5,6 +5,12 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import multiprocessing
 import threading
+# Bu kod, bir çoklu işlem desteği sunan bir Python kayıt modülü olarak kullanılabilecek
+# bir sınıf olan MultiProcessingHandler sınıfını ve bu sınıfın iki yardımcı fonksiyonunu içerir.
+# MultiProcessingHandler sınıfı, çoklu işlem desteği sunan bir işleyici olarak davranır ve
+# bir kayıtçının yerine kullanılabilir.
+#
+
 
 try:
     from queue import Empty
@@ -17,9 +23,9 @@ __version__ = "0.3.4"
 
 def install_mp_handler(logger=None):
     """Wraps the handlers in the given Logger with an MultiProcessingHandler.
-
     :param logger: whose handlers to wrap. By default, the root logger.
     """
+    # install_mp_handler() fonksiyonu, belirtilen Logger nesnesinin işleyicilerini MultiProcessingHandler nesnesiyle değiştirir. Varsayılan olarak, root logger'ın işleyicileri kullanılır.
     if logger is None:
         logger = logging.getLogger()
 
@@ -32,9 +38,11 @@ def install_mp_handler(logger=None):
 
 def uninstall_mp_handler(logger=None):
     """Unwraps the handlers in the given Logger from a MultiProcessingHandler wrapper
-
     :param logger: whose handlers to unwrap. By default, the root logger.
     """
+    # uninstall_mp_handler() fonksiyonu, belirtilen Logger nesnesinin işleyicilerini 
+    # MultiProcessingHandler nesnesinden geri alır. Varsayılan olarak, root logger'ın işleyicileri kullanılır.
+
     if logger is None:
         logger = logging.getLogger()
 
@@ -46,6 +54,21 @@ def uninstall_mp_handler(logger=None):
 
 
 class MultiProcessingHandler(logging.Handler):
+    # MultiProcessingHandler sınıfı, logging.Handler sınıfını alt sınıf olarak kullanır. 
+    # Bu nedenle, MultiProcessingHandler, log kayıtlarını almak ve işlemek için gerekli 
+    # olan tüm yöntemlere sahiptir. Bu sınıf, bir alt işleyici olarak başka bir işleyiciyi 
+    # kabul eder ve bu alt işleyiciyi kullanarak kayıtları işler. Sınıf ayrıca, bir Queue 
+    # nesnesi üzerinden ana süreç ile alt işlem arasındaki iletişimi yönetir. 
+    # Bu sınıfın _send() ve _receive() yöntemleri, log kayıtlarını işleyicinin alt işleyicisine 
+    # gönderir ve oradan alır.
+    # Bu kodda kullanılan MultiProcessingHandler sınıfı, log kayıtlarının çocuk işlemlerden 
+    # ana sürece aktarılmasını sağlar. Bu, çocuk işlemlerin, ana işlemin log kayıtlarını 
+    # dinleyememesi durumunda kullanışlı olabilir. Bu durum genellikle, çocuk işlemlerin 
+    # fork edildiği zamanlarda meydana gelir. Çocuk işlem, ana işlemin log kayıtlarını 
+    # dinleyemez çünkü birçok işletim sistemi, çocuk işlemdeki değişikliklerin ana 
+    # süreçte yansıtılmamasını sağlar. Bu nedenle, MultiProcessingHandler sınıfı, 
+    # bir Queue nesnesi kullanarak, log kayıtlarının çocuk işlemlerden ana sürece iletilmesini sağlar.
+
     def __init__(self, name, sub_handler=None):
         super(MultiProcessingHandler, self).__init__()
 
